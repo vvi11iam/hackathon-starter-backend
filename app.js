@@ -85,6 +85,8 @@ const aiAgentController = require('./controllers/ai-agent');
 const contactController = require('./controllers/contact');
 const webauthnController = require('./controllers/webauthn');
 
+const blogRoutes = require('./routes/blog');
+
 /**
  * API keys and Passport configuration.
  */
@@ -144,18 +146,18 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(flash);
-app.use((req, res, next) => {
-  if (req.path === '/api/upload' || req.path === '/ai/llm-camera') {
-    // Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
-    // WARN: Any path that is not protected by CSRF here should have lusca.csrf() chained
-    // in their route handler.
-    next();
-  } else {
-    lusca.csrf()(req, res, next);
-  }
-});
-app.use(lusca.xframe('SAMEORIGIN'));
-app.use(lusca.xssProtection(true));
+// app.use((req, res, next) => {
+//   if (req.path === '/api/upload' || req.path === '/ai/llm-camera') {
+//     // Multer multipart/form-data handling needs to occur before the Lusca CSRF check.
+//     // WARN: Any path that is not protected by CSRF here should have lusca.csrf() chained
+//     // in their route handler.
+//     next();
+//   } else {
+//     lusca.csrf()(req, res, next);
+//   }
+// });
+// app.use(lusca.xframe('SAMEORIGIN'));
+// app.use(lusca.xssProtection(true));
 app.disable('x-powered-by');
 app.use((req, res, next) => {
   res.locals.user = req.user;
@@ -282,6 +284,11 @@ app.get('/api/trakt', apiController.getTrakt);
 app.get('/api/pubchem', apiController.getPubChem);
 app.get('/api/wikipedia', apiController.getWikipedia);
 app.get('/api/giphy', apiController.getGiphy);
+
+/**
+ * Blog routes.
+ */
+app.use('/blog', blogRoutes);
 
 /**
  * AI Integrations and Boilerplate example routes.
